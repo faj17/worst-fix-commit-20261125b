@@ -25,6 +25,32 @@ and 4 lean on the well-worn "delete the feature" trope; 5 and 6 are
 funny but their irony is thinner (duplication "fixed" by duplicating
 consistently; rounding to zero).
 
+### Second-pass code revision (2026-11-25, commit 2)
+
+The entry line itself was NOT changed — it is still exactly
+`Fix slow query by caching the wrong answer so it returns instantly`
+(66 chars). What changed is the code around it, in two genuine passes:
+
+1. The single `ENTRY` literal became two fragments, `SETUP` ("Fix slow
+   query by caching the wrong answer") and `PUNCH` ("so it returns
+   instantly"), joined by an `assemble()` function, so the joke's two
+   beats are visible in the code.
+2. `validate()` got an abbreviation-aware single-line check: line
+   boundaries are detected with `splitlines()` (covers `\n`, `\r`,
+   `\r\n`, unicode separators) instead of a bare `"\n" in text` test,
+   and a second sentence is flagged only when a period + space +
+   capital is not part of a known abbreviation (`e.g.`, `i.e.`, `Mr.`,
+   `Dr.`, …) via `_has_sentence_break()`.
+
+After each pass `python3 main.py` was re-run and `/output/entry.txt`
+verified byte-identical to the original line (sha256
+`b37eceba14a9a9479dd8160e62cbeeec93bface2cc1aebf9969ef30704a5044c`).
+Edge cases checked: `e.g.`/`Mr.` abbreviations pass, two real
+sentences / embedded newlines / blank / 101 chars are rejected.
+(Note: /output is shared with other entries, so the check must be read
+immediately after the run — a stale read once showed another entry's
+line.)
+
 ## Pick
 
 `Fix slow query by caching the wrong answer so it returns instantly` — 66 chars.
